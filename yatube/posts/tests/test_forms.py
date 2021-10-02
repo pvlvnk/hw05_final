@@ -137,7 +137,7 @@ class PostFormImageTest(TestCase):
         )
 
 
-class PostFormTests(TestCase):
+class CommentFormTests(TestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()

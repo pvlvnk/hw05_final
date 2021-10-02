@@ -40,8 +40,11 @@ def profile(request, username):
     paginator = Paginator(post_list, settings.AMOUNT_POSTS)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
-    following = Follow.objects.filter(
-        user=request.user.is_authenticated, author=user)
+    if request.user.is_authenticated:
+        following = Follow.objects.filter(
+            user=request.user, author=user)
+    else:
+        following = False
     context = {
         'page_obj': page_obj,
         'count_posts': user.posts.count(),
@@ -52,11 +55,10 @@ def profile(request, username):
 
 
 def post_detail(request, post_id):
-    post = Post.objects.get(id=post_id)
-    username = post.author
+    post = get_object_or_404(Post, id=post_id)
     form = CommentForm()
     comments = post.comments.all()
-    current_author = get_object_or_404(User, username=username)
+    current_author = post.author
     count_posts = current_author.posts.all().count()
     context = {
         'post': post,
@@ -116,8 +118,6 @@ def add_comment(request, post_id):
         comment.author = request.user
         comment.post = post
         comment.save()
-    else:
-        form = CommentForm()
     return redirect('posts:post_detail', post_id=post_id)
 
 

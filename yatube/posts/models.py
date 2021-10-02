@@ -1,6 +1,7 @@
 from core.models import CreatedModel
 from django.contrib.auth import get_user_model
 from django.db import models
+from django.db.models import constraints
 
 User = get_user_model()
 
@@ -71,7 +72,8 @@ class Comment(CreatedModel):
         Post,
         on_delete=models.CASCADE,
         related_name='comments',
-        verbose_name='Пост, к которому прикрепляется комментарий'
+        verbose_name='Пост, к которому прикрепляется комментарий',
+        help_text='Укажите пост'
     )
     author = models.ForeignKey(
         User,
@@ -99,10 +101,21 @@ class Follow(models.Model):
         on_delete=models.CASCADE,
         related_name='follower',
         verbose_name='Пользователь',
+        help_text='Укажите подписчика'
     )
     author = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
         related_name='following',
-        verbose_name='Автор'
+        verbose_name='Автор',
+        help_text='Укажите автора'
     )
+
+    class Meta:
+        constraints = [
+            constraints.UniqueConstraint(
+                fields=['user', 'author'], name='follow_unique')
+        ]
+
+        def __str__(self):
+            return self.user.username, self.author.username
