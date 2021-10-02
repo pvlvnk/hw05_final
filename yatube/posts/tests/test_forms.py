@@ -171,7 +171,7 @@ class PostFormTests(TestCase):
             'text': 'Тестовый комментарий',
         }
         response = self.author_client.post(
-            reverse('posts:add_comment'),
+            reverse('posts:add_comment', args=[self.post.id]),
             data=form_data,
             follow=True,
         )
@@ -180,6 +180,6 @@ class PostFormTests(TestCase):
         self.assertEqual(Comment.objects.count(), comment_count + 1)
         self.assertTrue(
             Comment.objects.filter(
-                text='Тестовый омментарий',
+                text='Тестовый комментарий',
             ).exists()
         )
