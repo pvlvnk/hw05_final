@@ -24,10 +24,10 @@
     {% endthumbnail %}
     <p>  <a href="{% url 'posts:post_detail' post.id %}">подробная информация</a> </p>
     {% if post.group.slug %}
-    <p>  <a href="{% url 'posts:group_list' post.group.slug %}">все записи группы</a> </p>
+      <p>  <a href="{% url 'posts:group_list' post.group.slug %}">все записи группы</a> </p>
     {% endif %}
     {% if not forloop.last %}<hr>{% endif %}
   {% endfor %}
-    {% include 'includes/paginator.html' %}
+  {% include 'includes/paginator.html' %}
 </div>
 {% endblock content %}

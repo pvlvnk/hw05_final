@@ -44,9 +44,9 @@
         <img class="card-img my-2" src="{{ im.url }}">
       {% endthumbnail %}
       {% if request.user == post.author %}
-      <a class="btn btn-primary" href="{% url 'posts:post_edit' post.id %}">
-        редактировать запись
-      </a>
+        <a class="btn btn-primary" href="{% url 'posts:post_edit' post.id %}">
+          редактировать запись
+        </a>
       {% endif %}
       {% include 'includes/comment.html' %}
       {% if user.is_authenticated %}
