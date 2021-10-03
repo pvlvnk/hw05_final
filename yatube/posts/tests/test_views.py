@@ -9,7 +9,7 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import Client, TestCase, override_settings
 from django.urls import reverse
 
-from ..models import Follow, Group, Post
+from ..models import Comment, Follow, Group, Post
 
 TEMP_MEDIA_ROOT = tempfile.mkdtemp(dir=settings.BASE_DIR)
 
@@ -314,6 +314,55 @@ class FollowTest(TestCase):
         ).delete()
         response = self.follower_client.get(reverse('posts:follow_index'))
         self.assertEqual = (len(response.context['page_obj']), 0)
+
+
+class CommentTest(TestCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.author = User.objects.create_user(username='author')
+        cls.commentator = User.objects.create_user(username='commentator')
+        cls.commentator_client = Client()
+        cls.commentator_client.force_login(cls.commentator)
+        cls.post = Post.objects.create(
+            text='Тестовый текст поста',
+            author=cls.author
+        )
+        cls.comment = Comment.objects.create(
+            post=cls.post,
+            author=cls.commentator,
+            text='Тестовый текст комментария'
+        )
+
+    def test_comment(self):
+        """в базе создается объект comment и только один"""
+        self.assertTrue(
+            Comment.objects.filter(
+                post=self.post,
+                author=self.commentator,
+                text='Тестовый текст комментария'
+            ).exists
+        )
+        response = Comment.objects.filter(
+            post=self.post,
+            author=self.commentator,
+            text='Тестовый текст комментария'
+        ).count()
+        self.assertEqual(response, 1)
+
+    def test_comment_context(self):
+        """Шаблон post_detail сформирован с правильными комментариями"""
+        response = self.commentator_client.get(
+            reverse('posts:post_detail', args=[self.post.id]))
+        comments = response.context['comments'][0]
+        expected_fields = {
+            comments.author.username: 'commentator',
+            comments.post.id: self.post.id,
+            comments.text: 'Тестовый текст комментария'
+        }
+        for fields, values in expected_fields.items():
+            with self.subTest(expected_fields=expected_fields):
+                self.assertEqual(fields, values)
 
 
 class CacheTest(TestCase):
