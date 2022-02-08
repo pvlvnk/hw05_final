@@ -148,3 +148,5 @@ def profile_unfollow(request, username):
     if request.method != 'POST':
         unfollowing.delete()
     return redirect('posts:profile', author)
+
+
